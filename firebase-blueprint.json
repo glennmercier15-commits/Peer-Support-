@@ -1,0 +1,215 @@
+{
+  "entities": {
+    "Organization": {
+      "title": "Organization",
+      "description": "Represents an organization using the platform.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "subscriptionPlan": { "type": "string", "enum": ["free", "pro", "enterprise"] }
+      },
+      "required": ["name", "createdAt"]
+    },
+    "User": {
+      "title": "User",
+      "description": "Represents a staff member (specialist, supervisor, admin).",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email" },
+        "name": { "type": "string" },
+        "role": { "type": "string", "enum": ["specialist", "supervisor", "admin"] },
+        "orgId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "wellnessState": { "type": "object" }
+      },
+      "required": ["email", "role", "orgId"]
+    },
+    "Peer": {
+      "title": "Peer",
+      "description": "Represents a person receiving support.",
+      "type": "object",
+      "properties": {
+        "firstName": { "type": "string" },
+        "lastInitial": { "type": "string" },
+        "preferredName": { "type": "string" },
+        "pronouns": { "type": "string" },
+        "orgId": { "type": "string" },
+        "specialistId": { "type": "string" },
+        "supportGoals": { "type": "array", "items": { "type": "string" } },
+        "strengths": { "type": "array", "items": { "type": "string" } },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["firstName", "orgId", "specialistId"]
+    },
+    "Interaction": {
+      "title": "Interaction",
+      "description": "Notes from a peer support meeting.",
+      "type": "object",
+      "properties": {
+        "peerId": { "type": "string" },
+        "specialistId": { "type": "string" },
+        "orgId": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "type": { "type": "string", "enum": ["in-person", "phone", "virtual", "text"] },
+        "notes": { "type": "string" },
+        "aiSummary": { "type": "string" },
+        "strengthsIdentified": { "type": "array", "items": { "type": "string" } },
+        "actionItems": { "type": "array", "items": { "type": "string" } },
+        "followUpDate": { "type": "string", "format": "date" }
+      },
+      "required": ["peerId", "specialistId", "orgId", "date"]
+    },
+    "Goal": {
+      "title": "Goal",
+      "description": "A recovery or support goal for a peer.",
+      "type": "object",
+      "properties": {
+        "peerId": { "type": "string" },
+        "orgId": { "type": "string" },
+        "category": { "type": "string" },
+        "title": { "type": "string" },
+        "status": { "type": "string", "enum": ["not-started", "in-progress", "completed", "paused"] },
+        "progress": { "type": "number" },
+        "milestones": { "type": "array" }
+      },
+      "required": ["peerId", "orgId", "title", "status"]
+    },
+    "SafetyPlan": {
+      "title": "Safety Plan",
+      "description": "A collaborative safety plan for a peer.",
+      "type": "object",
+      "properties": {
+        "peerId": { "type": "string" },
+        "orgId": { "type": "string" },
+        "warningSigns": { "type": "array" },
+        "copingStrategies": { "type": "array" },
+        "emergencyContacts": { "type": "array" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["peerId", "orgId"]
+    },
+    "WellnessCheck": {
+      "title": "Wellness Check",
+      "description": "A self-care and wellness assessment log for a specialist.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "date": { "type": "string", "format": "date-time" },
+        "mood": { "type": "number" },
+        "energy": { "type": "number" },
+        "stress": { "type": "number" },
+        "notes": { "type": "string" },
+        "burnoutRisk": { "type": "number" },
+        "compassionFatigue": { "type": "number" }
+      },
+      "required": ["userId", "date", "mood", "energy", "stress"]
+    },
+    "Resource": {
+      "title": "Resource",
+      "description": "A community resource or service provider.",
+      "type": "object",
+      "properties": {
+        "orgId": { "type": "string" },
+        "name": { "type": "string" },
+        "category": { "type": "string" },
+        "description": { "type": "string" },
+        "province": { "type": "string" },
+        "city": { "type": "string" },
+        "contactInfo": { "type": "string" },
+        "website": { "type": "string" },
+        "serviceType": { "type": "string" }
+      },
+      "required": ["orgId", "name", "category", "description", "city", "contactInfo"]
+    },
+    "SelfCarePlan": {
+      "title": "Self-Care Plan",
+      "description": "A specialist's personal respite and wellness maintenance plan.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "warningSigns": { "type": "array", "items": { "type": "string" } },
+        "triggers": { "type": "array", "items": { "type": "string" } },
+        "copingSkills": { "type": "array", "items": { "type": "string" } },
+        "personalSupports": { "type": "array", "items": { "type": "string" } },
+        "professionalSupports": { "type": "array", "items": { "type": "string" } },
+        "rechargeActivities": { "type": "array", "items": { "type": "string" } },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "updatedAt"]
+    },
+    "ChatRoom": {
+      "title": "Chat Room",
+      "description": "A conversation space for specialists.",
+      "type": "object",
+      "properties": {
+        "orgId": { "type": "string" },
+        "participants": { "type": "array", "items": { "type": "string" } },
+        "lastMessage": { "type": "string" },
+        "lastActivity": { "type": "string", "format": "date-time" },
+        "type": { "type": "string", "enum": ["direct", "group"] },
+        "name": { "type": "string" }
+      },
+      "required": ["orgId", "participants", "lastActivity", "type"]
+    },
+    "ChatMessage": {
+      "title": "Chat Message",
+      "description": "An individual message within a room.",
+      "type": "object",
+      "properties": {
+        "roomId": { "type": "string" },
+        "senderId": { "type": "string" },
+        "senderName": { "type": "string" },
+        "content": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["roomId", "senderId", "senderName", "content", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/organizations/{orgId}": {
+      "schema": "Organization",
+      "description": "Top-level metadata for organizations."
+    },
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User profiles and roles."
+    },
+    "/peers/{peerId}": {
+      "schema": "Peer",
+      "description": "Peer records (the people being supported)."
+    },
+    "/interactions/{interactionId}": {
+      "schema": "Interaction",
+      "description": "Documented logs of meetings."
+    },
+    "/goals/{goalId}": {
+      "schema": "Goal",
+      "description": "Specific goals for peers."
+    },
+    "/safetyPlans/{planId}": {
+      "schema": "SafetyPlan",
+      "description": "Safety plans for peers."
+    },
+    "/wellness_checks/{checkId}": {
+      "schema": "WellnessCheck",
+      "description": "Individual wellness logs."
+    },
+    "/resources/{resourceId}": {
+      "schema": "Resource",
+      "description": "Community resource directory entries."
+    },
+    "/self_care_plans/{planId}": {
+      "schema": "SelfCarePlan",
+      "description": "Personalized self-care plans for specialists."
+    },
+    "/chat_rooms/{roomId}": {
+      "schema": "ChatRoom",
+      "description": "Shared chat spaces."
+    },
+    "/chat_rooms/{roomId}/messages/{msgId}": {
+      "schema": "ChatMessage",
+      "description": "Messages within a room."
+    }
+  }
+}

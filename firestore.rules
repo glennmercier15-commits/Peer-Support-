@@ -1,0 +1,93 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOrgMember(orgId) {
+      return isSignedIn() && 
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.orgId == orgId;
+    }
+
+    // User profiles
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Organizations
+    match /organizations/{orgId} {
+      allow read: if isSignedIn() && isOrgMember(orgId);
+      allow write: if isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Peers
+    match /peers/{peerId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isOrgMember(request.resource.data.orgId);
+      allow update, delete: if isSignedIn() && isOrgMember(resource.data.orgId);
+    }
+
+    // Interactions
+    match /interactions/{id} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isOrgMember(request.resource.data.orgId);
+      allow update, delete: if isSignedIn() && isOrgMember(resource.data.orgId);
+    }
+
+    // Goals
+    match /goals/{id} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isOrgMember(request.resource.data.orgId);
+      allow update, delete: if isSignedIn() && isOrgMember(resource.data.orgId);
+    }
+
+    // Safety Plans
+    match /safetyPlans/{id} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isOrgMember(request.resource.data.orgId);
+      allow update, delete: if isSignedIn() && isOrgMember(resource.data.orgId);
+    }
+
+    // Wellness Checks
+    match /wellness_checks/{id} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // Resources
+    match /resources/{id} {
+      allow read: if isOrgMember(resource.data.orgId);
+      allow create: if isSignedIn() && isOrgMember(request.resource.data.orgId);
+      allow update, delete: if isSignedIn() && isOrgMember(resource.data.orgId);
+    }
+
+    // Self-Care Plans
+    match /self_care_plans/{id} {
+      allow read: if isSignedIn() && (resource == null || resource.data.userId == request.auth.uid);
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // Chat
+    match /chat_rooms/{roomId} {
+      allow read: if isSignedIn() && request.auth.uid in resource.data.participants;
+      allow create: if isSignedIn() && request.auth.uid in request.resource.data.participants;
+      allow update: if isSignedIn() && request.auth.uid in resource.data.participants;
+      
+      match /messages/{msgId} {
+        allow read: if isSignedIn() && request.auth.uid in get(/databases/$(database)/documents/chat_rooms/$(roomId)).data.participants;
+        allow create: if isSignedIn() && request.auth.uid == request.resource.data.senderId && 
+                        request.auth.uid in get(/databases/$(database)/documents/chat_rooms/$(roomId)).data.participants;
+      }
+    }
+  }
+}

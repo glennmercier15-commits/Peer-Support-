@@ -1,0 +1,6 @@
+{
+  "name": "PeerConnect Pro",
+  "description": "A comprehensive peer support and recovery-oriented support platform for Canadian specialists, featuring secure documentation, AI-powered conversation coaching, goal tracking, and safety planning.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
